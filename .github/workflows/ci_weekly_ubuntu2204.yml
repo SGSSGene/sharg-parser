@@ -2,7 +2,9 @@ name: CI on Ubuntu 22.04
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 * * * *'
+  # Enables a manual trigger, may run on any branch
+  workflow_dispatch:
 
 concurrency:
   group: ubuntu2204-${{ github.event.pull_request.number || github.ref }}
@@ -19,18 +21,18 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ format('{0}, {1}', matrix.name, matrix.build_type) }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
     strategy:
       fail-fast: true
       matrix:
+        build_type: [Release, Debug]
         include:
           - name: "Unit gcc12"
             cxx: "g++-12"
-            cc: "gcc-12"
+            cc:  "gcc-12"
             build: unit
-            build_type: Release
 
     steps:
       - name: Checkout
